@@ -6,7 +6,7 @@
 
     <!-- 项目基本信息 -->
     <groupId>com.example</groupId>
-    <artifactId>ecommerce</artifactId>
+    <artifactId>bigData</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
@@ -50,14 +50,6 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.16</version>
-        </dependency>
-
-        <!-- Lombok 简化代码 -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.16</version>
-            <optional>true</optional>
         </dependency>
 
         <!-- 单元测试 -->
