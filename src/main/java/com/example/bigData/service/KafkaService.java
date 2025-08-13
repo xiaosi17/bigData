@@ -11,6 +11,7 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -20,17 +21,18 @@ import java.util.Properties;
 @Service
 public class KafkaService {
 
-    private static final String TOPIC = "sensor-data";
-    private static final String BOOTSTRAP_SERVERS = "14.22.77.247:9092";
+    @Value("${kafka.topic}")
+    private String topic;
+    @Value("${kafka.bootstrap-servers}")
+    private String bootstrapServers;
     @Autowired
     private SensorDataMapper sensorDataMapper;
     public void publish(String payload) {
 
         // 1. 配置生产者参数
         Properties props = new Properties();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS);
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         // 序列化, Java字符串对象转换为字节数组以便网络传输
-
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 
@@ -39,7 +41,7 @@ public class KafkaService {
 
         // 3. 构造消息记录
         ProducerRecord<String, String> record =
-                new ProducerRecord<>(TOPIC, payload);
+                new ProducerRecord<>(topic, payload);
 
         // 4. 异步发送消息
         producer.send(record, (metadata, exception) -> {
@@ -59,7 +61,7 @@ public class KafkaService {
     public void consumer() {
         // 1. 配置消费者参数
         Properties props = new Properties();
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS);
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "remote-consumer-group");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
                 "org.apache.kafka.common.serialization.StringDeserializer");
@@ -71,7 +73,7 @@ public class KafkaService {
         // 2. 创建消费者实例
         try (Consumer<String, String> consumer = new KafkaConsumer<>(props)) {
             // 3. 订阅主题
-            consumer.subscribe(Collections.singleton(TOPIC));
+            consumer.subscribe(Collections.singleton(topic));
 
             // 4. 消费消息循环
             while (true) {

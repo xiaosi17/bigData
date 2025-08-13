@@ -2,6 +2,7 @@ package com.example.bigData.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.example.bigData.dto.SensorDataReq;
+import com.example.bigData.service.FlinkKafkaService;
 import com.example.bigData.service.KafkaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,8 @@ public class KafkaController {
 
     @Autowired
     private KafkaService kafkaService;
+    @Autowired
+    private FlinkKafkaService flinkKafkaService;
     @PostMapping("/publish")
     public String publishMessage(@RequestBody SensorDataReq sensorDataReq) {
         // 对象转JSON字符串
@@ -28,6 +31,16 @@ public class KafkaController {
     public String consumerTopic() {
         try {
             kafkaService.consumer();
+            return "订阅成功";
+        } catch (Exception e) {
+            return "订阅失败：" + e.getMessage();
+        }
+    }
+
+    @GetMapping("/flink/consumer")
+    public String flinkConsumerTopic() {
+        try {
+            flinkKafkaService.consumer();
             return "订阅成功";
         } catch (Exception e) {
             return "订阅失败：" + e.getMessage();
